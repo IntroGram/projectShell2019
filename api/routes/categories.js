@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRepository } from 'typeorm';
+import { getRepository, getManager } from 'typeorm';
 import isAuthenticated from '../middleware/isAuthenticated';
 import Categories from '../entities/categories';
 
@@ -8,6 +8,15 @@ router.route('/categories')
   .all(isAuthenticated)
   .get((req, res) => {
     res.send(req.user.userCategories);
+  })
+  .post((req, res) => {
+    const { name } = req.body;
+    const manager = getManager();
+    const category = manager.create(Categories, {name});
+    category.user = req.user;
+    manager.save(category).then((savedCategory) => {
+      res.send(savedCategory);
+    });
   });
 router.route('/categories/:id')
   .all(isAuthenticated)

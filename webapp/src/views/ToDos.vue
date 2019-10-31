@@ -15,8 +15,8 @@
     <section class="newTodo columns is-centered">
       <div class="column is-half">
         <h5 class="title is-5">New ToDo</h5>
-        <form v-on:submit.prevent="onSubmit">
-          <b-field label="Category">
+          <span class="columns">
+          <b-field label="Category" class="column">
             <b-select placeholder="Select a category" v-model="newTodo.category">
               <option
                 v-for="category in categories"
@@ -26,9 +26,21 @@
               </option>
             </b-select>
           </b-field>
+          <b-field label="Add a Category" class="column">
+            <b-input v-model="newCategory.name" />
+          </b-field>
+          <form @submit.prevent="onSubmitCat">
+            <b-field>
+              <div class="control is-block column">
+                <input type="submit" class="button is-link add-category" value="Add Category" />
+              </div>
+            </b-field>
+          </form>
+          </span>
           <b-field label="Title">
             <b-input v-model="newTodo.title" />
           </b-field>
+        <form v-on:submit.prevent="onSubmit">
           <b-field>
             <div class="control is-block">
               <input type="submit" class="button is-link" value="Submit" />
@@ -49,6 +61,9 @@ export default {
       newTodo: {
         title: null,
         category: null
+      },
+      newCategory: {
+        name: null
       }
     };
   },
@@ -78,6 +93,11 @@ export default {
             this.$router.push("/");
           });
         });
+    },
+    onSubmitCat(){
+      this.$store.dispatch("addCategory", this.newCategory).then(() => {
+        this.newCategory.name = null;
+      })
     }
   },
   mounted: function() {
@@ -89,4 +109,8 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.add-category{
+  margin-top: 32px;
+}
+</style>

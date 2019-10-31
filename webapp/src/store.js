@@ -26,6 +26,9 @@ export const mutations = {
   },
   categoriesLoaded(state, categories) {
     state.categories = categories;
+  },
+  addCategory(state, category) {
+    state.categories = [...state.categories, { ...category}];
   }
 };
 
@@ -70,6 +73,11 @@ export const actions = {
   loadCategories({ commit }) {
     return axios.get("/api/categories").then(response => {
       commit("categoriesLoaded", response.data);
+    });
+  },
+  addCategory({ commit }, category) {
+    return axios.post("/api/categories", category).then(response => {
+      commit("addCategory", response.data);
     });
   }
 };

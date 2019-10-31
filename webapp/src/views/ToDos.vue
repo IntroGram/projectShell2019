@@ -7,8 +7,8 @@
     </div>
     <div class="columns is-centered">
       <div class="column is-half">
-        <template v-for="todo in todos">
-          <ToDo :key="todo.id" :todo="todo" />
+        <template v-for="category in categories">
+          <Category :key="category.id" :category="category" />
         </template>
       </div>
     </div>
@@ -16,6 +16,16 @@
       <div class="column is-half">
         <h5 class="title is-5">New ToDo</h5>
         <form v-on:submit.prevent="onSubmit">
+          <b-field label="Category">
+            <b-select placeholder="Select a category" v-model="newTodo.category">
+              <option
+                v-for="category in categories"
+                :value="category.id"
+                :key="category.id">
+                {{ category.name }}
+              </option>
+            </b-select>
+          </b-field>
           <b-field label="Title">
             <b-input v-model="newTodo.title" />
           </b-field>
@@ -31,36 +41,51 @@
 </template>
 
 <script>
-import ToDo from "@/components/ToDo.vue";
+import Category from "@/components/Category.vue";
 export default {
   name: "ToDos",
   data: function() {
     return {
       newTodo: {
-        title: null
+        title: null,
+        category: null
       }
     };
   },
   computed: {
     todos() {
       return this.$store.state.todos;
+    },
+    categories() {
+      return this.$store.state.categories;
     }
   },
   components: {
-    ToDo
+    Category
   },
   methods: {
     onSubmit() {
+      if (this.newTodo.title === null || this.newTodo.category === null) {
+        this.$buefy.dialog.alert("Category or Title may not be empty.");
+        return;
+      }
       this.$store.dispatch("addToDo", this.newTodo).then(() => {
-        this.newTodo.title = null;
-      });
+          this.newTodo.title = null;
+          this.newTodo.category = null;
+        }).then(() => {
+          this.$store.dispatch("loadCategories").catch(() => {
+            // if we are not logged in redirect home
+            this.$router.push("/");
+          });
+        });
     }
   },
   mounted: function() {
     this.$store.dispatch("loadToDos").catch(() => {
       // if we are not logged in redirect home
       this.$router.push("/");
-    })
+    }),
+      this.$store.dispatch("loadCategories");
   }
 };
 </script>

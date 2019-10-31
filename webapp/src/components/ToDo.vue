@@ -1,6 +1,6 @@
 <template>
   <div class="todo columns">
-    <b-checkbox v-model="todo.done" v-on:input="handleCheck" />
+    <b-checkbox v-model="todo.done" v-on:input="handleCheck" class="checkbox" />
     <span class="todo-title column">
       {{ todo.title }}
     </span>
@@ -29,3 +29,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.checkbox {
+  padding-left: 14px;
+}
+</style>

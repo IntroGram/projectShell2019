@@ -2,23 +2,27 @@ import { Router } from 'express';
 import { getRepository, getManager } from 'typeorm';
 import isAuthenticated from '../middleware/isAuthenticated';
 import ToDo from '../entities/todo';
+import Categories from '../entities/categories';
 
 const router = Router();
 router.route('/todos')
   .all(isAuthenticated)
   .get((req, res) => {
-    getRepository(ToDo).find({ where: { userId: req.user.id } }).then((todos) => {
-      res.send(todos);
-    });
+    res.send(req.user.todos)
   })
   .post((req, res) => {
-    const { done, title } = req.body;
+    const { done, title, category:categoryid} = req.body;
     const manager = getManager();
-    const todo = manager.create(ToDo, { done, title });
+    const todo = manager.create(ToDo, { done, title});
     todo.user = req.user;
-    manager.save(todo).then((savedTodo) => {
-      res.send(savedTodo);
-    });
+    getRepository(Categories).findOne(
+      categoryid
+    ).then((_foundCategory) => {
+      todo.category = _foundCategory;
+      manager.save(todo).then((savedTodo) => {
+        res.send(savedTodo);
+      });
+    })
   });
 router.route('/todos/:id')
   .all(isAuthenticated)
